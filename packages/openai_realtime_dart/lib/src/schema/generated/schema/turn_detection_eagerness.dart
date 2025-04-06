@@ -5,13 +5,17 @@
 part of openai_realtime_schema;
 
 // ==========================================
-// ENUM: TurnDetectionType
+// ENUM: TurnDetectionEagerness
 // ==========================================
 
-/// The type of turn detection.
-enum TurnDetectionType {
-  @JsonValue('server_vad')
-  serverVad,
-  @JsonValue('semantic_vad')
-  semanticVad,
+/// The eagerness of `semantic_vad` turn detection.
+enum TurnDetectionEagerness {
+  @JsonValue('low')
+  low,
+  @JsonValue('medium')
+  medium,
+  @JsonValue('high')
+  high,
+  @JsonValue('auto')
+  auto,
 }

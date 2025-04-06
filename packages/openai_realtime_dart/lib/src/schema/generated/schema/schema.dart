@@ -24,6 +24,7 @@ part 'tool_choice_forced.dart';
 part 'input_audio_transcription_config.dart';
 part 'turn_detection.dart';
 part 'turn_detection_type.dart';
+part 'turn_detection_eagerness.dart';
 part 'rate_limit.dart';
 part 'rate_limit_name.dart';
 part 'response.dart';

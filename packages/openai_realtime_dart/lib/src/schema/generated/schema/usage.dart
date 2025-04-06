@@ -83,6 +83,10 @@ class UsageInputTokenDetails with _$UsageInputTokenDetails {
 
     /// The number of audio tokens used in the Response.
     @JsonKey(name: 'audio_tokens', includeIfNull: false) int? audioTokens,
+
+    /// Details about the cached tokens used in the Response.
+    @JsonKey(name: 'cached_tokens_details', includeIfNull: false)
+    UsageInputTokenDetailsCachedTokensDetails? cachedTokensDetails,
   }) = _UsageInputTokenDetails;
 
   /// Object construction from a JSON representation
@@ -93,7 +97,8 @@ class UsageInputTokenDetails with _$UsageInputTokenDetails {
   static const List<String> propertyNames = [
     'cached_tokens',
     'text_tokens',
-    'audio_tokens'
+    'audio_tokens',
+    'cached_tokens_details'
   ];
 
   /// Perform validations on the schema property values
@@ -107,6 +112,7 @@ class UsageInputTokenDetails with _$UsageInputTokenDetails {
       'cached_tokens': cachedTokens,
       'text_tokens': textTokens,
       'audio_tokens': audioTokens,
+      'cached_tokens_details': cachedTokensDetails,
     };
   }
 }
@@ -132,6 +138,47 @@ class UsageOutputTokenDetails with _$UsageOutputTokenDetails {
   /// Object construction from a JSON representation
   factory UsageOutputTokenDetails.fromJson(Map<String, dynamic> json) =>
       _$UsageOutputTokenDetailsFromJson(json);
+
+  /// List of all property names of schema
+  static const List<String> propertyNames = ['text_tokens', 'audio_tokens'];
+
+  /// Perform validations on the schema property values
+  String? validateSchema() {
+    return null;
+  }
+
+  /// Map representation of object (not serialized)
+  Map<String, dynamic> toMap() {
+    return {
+      'text_tokens': textTokens,
+      'audio_tokens': audioTokens,
+    };
+  }
+}
+
+// ==========================================
+// CLASS: UsageInputTokenDetailsCachedTokensDetails
+// ==========================================
+
+/// Details about the cached tokens used in the Response.
+@freezed
+class UsageInputTokenDetailsCachedTokensDetails
+    with _$UsageInputTokenDetailsCachedTokensDetails {
+  const UsageInputTokenDetailsCachedTokensDetails._();
+
+  /// Factory constructor for UsageInputTokenDetailsCachedTokensDetails
+  const factory UsageInputTokenDetailsCachedTokensDetails({
+    /// The number of cached text tokens used in the Response.
+    @JsonKey(name: 'text_tokens', includeIfNull: false) int? textTokens,
+
+    /// The number of cached audio tokens used in the Response.
+    @JsonKey(name: 'audio_tokens', includeIfNull: false) int? audioTokens,
+  }) = _UsageInputTokenDetailsCachedTokensDetails;
+
+  /// Object construction from a JSON representation
+  factory UsageInputTokenDetailsCachedTokensDetails.fromJson(
+          Map<String, dynamic> json) =>
+      _$UsageInputTokenDetailsCachedTokensDetailsFromJson(json);
 
   /// List of all property names of schema
   static const List<String> propertyNames = ['text_tokens', 'audio_tokens'];

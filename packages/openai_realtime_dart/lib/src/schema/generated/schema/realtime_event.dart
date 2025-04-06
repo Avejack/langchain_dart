@@ -266,7 +266,8 @@ sealed class RealtimeEvent with _$RealtimeEvent {
 
     /// The ID of the preceding item in the Conversation context, allows the client to understand the
     /// order of the conversation.
-    @JsonKey(name: 'previous_item_id') required String? previousItemId,
+    @JsonKey(name: 'previous_item_id', includeIfNull: false)
+    String? previousItemId,
 
     /// The item to add to the conversation.
     /// Any of: [ItemMessage], [ItemFunctionCall], [ItemFunctionCallOutput]
@@ -324,6 +325,31 @@ sealed class RealtimeEvent with _$RealtimeEvent {
     /// The transcribed text.
     required String transcript,
   }) = RealtimeEventConversationItemInputAudioTranscriptionCompleted;
+
+  // ------------------------------------------
+  // UNION: RealtimeEventConversationItemInputAudioTranscriptionDelta
+  // ------------------------------------------
+
+  /// Returned when the text value of an input audio transcription content part is updated.
+
+  @FreezedUnionValue('conversation.item.input_audio_transcription.delta')
+  const factory RealtimeEvent.conversationItemInputAudioTranscriptionDelta({
+    /// The unique ID of the server event.
+    @JsonKey(name: 'event_id') required String eventId,
+
+    /// The event type, must be `conversation.item.input_audio_transcription.delta`.
+    @Default(RealtimeEventType.conversationItemInputAudioTranscriptionDelta)
+    RealtimeEventType type,
+
+    /// The ID of the item.
+    @JsonKey(name: 'item_id') required String itemId,
+
+    /// The index of the content part in the item's content array.
+    @JsonKey(name: 'content_index', includeIfNull: false) int? contentIndex,
+
+    /// The text delta.
+    @JsonKey(includeIfNull: false) String? delta,
+  }) = RealtimeEventConversationItemInputAudioTranscriptionDelta;
 
   // ------------------------------------------
   // UNION: RealtimeEventConversationItemInputAudioTranscriptionFailed
@@ -435,7 +461,8 @@ sealed class RealtimeEvent with _$RealtimeEvent {
     RealtimeEventType type,
 
     /// The ID of the preceding item after which the new item will be inserted.
-    @JsonKey(name: 'previous_item_id') required String previousItemId,
+    @JsonKey(name: 'previous_item_id', includeIfNull: false)
+    String? previousItemId,
 
     /// The ID of the user message item that will be created.
     @JsonKey(name: 'item_id') required String itemId,
@@ -1049,7 +1076,7 @@ sealed class RealtimeEvent with _$RealtimeEvent {
     @Default(RealtimeEventType.realtimeEvent) RealtimeEventType type,
 
     /// A Realtime API event.
-    /// Any of: [RealtimeEventConversationItemCreate], [RealtimeEventConversationItemDelete], [RealtimeEventConversationItemTruncate], [RealtimeEventInputAudioBufferAppend], [RealtimeEventInputAudioBufferClear], [RealtimeEventInputAudioBufferCommit], [RealtimeEventResponseCancel], [RealtimeEventResponseCreate], [RealtimeEventSessionUpdate], [RealtimeEventConversationCreated], [RealtimeEventConversationItemCreated], [RealtimeEventConversationItemDeleted], [RealtimeEventConversationItemInputAudioTranscriptionCompleted], [RealtimeEventConversationItemInputAudioTranscriptionFailed], [RealtimeEventConversationItemTruncated], [RealtimeEventError], [RealtimeEventInputAudioBufferCleared], [RealtimeEventInputAudioBufferCommitted], [RealtimeEventInputAudioBufferSpeechStarted], [RealtimeEventInputAudioBufferSpeechStopped], [RealtimeEventRateLimitsUpdated], [RealtimeEventResponseAudioDelta], [RealtimeEventResponseAudioDone], [RealtimeEventResponseAudioTranscriptDelta], [RealtimeEventResponseAudioTranscriptDone], [RealtimeEventResponseContentPartAdded], [RealtimeEventResponseContentPartDone], [RealtimeEventResponseCreated], [RealtimeEventResponseDone], [RealtimeEventResponseFunctionCallArgumentsDelta], [RealtimeEventResponseFunctionCallArgumentsDone], [RealtimeEventResponseOutputItemAdded], [RealtimeEventResponseOutputItemDone], [RealtimeEventResponseTextDelta], [RealtimeEventResponseTextDone], [RealtimeEventSessionCreated], [RealtimeEventSessionUpdated], [RealtimeEventClose], [RealtimeEventConversationInterrupted], [RealtimeEventConversationUpdated], [RealtimeEventConversationItemAppended], [RealtimeEventConversationItemCompleted], [RealtimeEventGeneric]
+    /// Any of: [RealtimeEventConversationItemCreate], [RealtimeEventConversationItemDelete], [RealtimeEventConversationItemTruncate], [RealtimeEventInputAudioBufferAppend], [RealtimeEventInputAudioBufferClear], [RealtimeEventInputAudioBufferCommit], [RealtimeEventResponseCancel], [RealtimeEventResponseCreate], [RealtimeEventSessionUpdate], [RealtimeEventConversationCreated], [RealtimeEventConversationItemCreated], [RealtimeEventConversationItemDeleted], [RealtimeEventConversationItemInputAudioTranscriptionCompleted], [RealtimeEventConversationItemInputAudioTranscriptionDelta], [RealtimeEventConversationItemInputAudioTranscriptionFailed], [RealtimeEventConversationItemTruncated], [RealtimeEventError], [RealtimeEventInputAudioBufferCleared], [RealtimeEventInputAudioBufferCommitted], [RealtimeEventInputAudioBufferSpeechStarted], [RealtimeEventInputAudioBufferSpeechStopped], [RealtimeEventRateLimitsUpdated], [RealtimeEventResponseAudioDelta], [RealtimeEventResponseAudioDone], [RealtimeEventResponseAudioTranscriptDelta], [RealtimeEventResponseAudioTranscriptDone], [RealtimeEventResponseContentPartAdded], [RealtimeEventResponseContentPartDone], [RealtimeEventResponseCreated], [RealtimeEventResponseDone], [RealtimeEventResponseFunctionCallArgumentsDelta], [RealtimeEventResponseFunctionCallArgumentsDone], [RealtimeEventResponseOutputItemAdded], [RealtimeEventResponseOutputItemDone], [RealtimeEventResponseTextDelta], [RealtimeEventResponseTextDone], [RealtimeEventSessionCreated], [RealtimeEventSessionUpdated], [RealtimeEventClose], [RealtimeEventConversationInterrupted], [RealtimeEventConversationUpdated], [RealtimeEventConversationItemAppended], [RealtimeEventConversationItemCompleted], [RealtimeEventGeneric]
     required RealtimeEvent event,
   }) = RealtimeEventGeneric;
 
@@ -1089,6 +1116,8 @@ enum RealtimeEventEnumType {
   conversationItemDeleted,
   @JsonValue('conversation.item.input_audio_transcription.completed')
   conversationItemInputAudioTranscriptionCompleted,
+  @JsonValue('conversation.item.input_audio_transcription.delta')
+  conversationItemInputAudioTranscriptionDelta,
   @JsonValue('conversation.item.input_audio_transcription.failed')
   conversationItemInputAudioTranscriptionFailed,
   @JsonValue('conversation.item.truncated')

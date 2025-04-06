@@ -55,11 +55,13 @@ class RealtimeAPI extends RealtimeEventHandler {
 
   /// Connects to Realtime API Websocket Server.
   Future<bool> connect({
-    final String model = 'gpt-4o-realtime-preview-2024-10-01',
+    final String model = 'gpt-4o-realtime-preview-2024-12-17',
   }) async {
     if (isConnected()) {
       throw Exception('Already connected');
     }
+
+    print('use model: $model');
 
     _configLogger();
 

@@ -204,6 +204,11 @@ class RealtimeClient extends RealtimeEventHandler {
 
       _log.fine('Result of calling "$name" tool:\n$result');
 
+      if (!isConnected()) {
+        _log.warning('RealtimeAPI is not connected, skipping tool output');
+        return;
+      }
+
       await realtime.send(
         RealtimeEvent.conversationItemCreate(
           eventId: RealtimeUtils.generateId(),
@@ -381,6 +386,24 @@ class RealtimeClient extends RealtimeEventHandler {
       ),
     );
     return createResponse();
+  }
+
+  /// Sends assistant message content. Useful for appending "history"
+  Future<bool> sendAssistantMessageContent(
+    List<ContentPartText> content,
+  ) async {
+    await realtime.send(
+      RealtimeEvent.conversationItemCreate(
+        eventId: RealtimeUtils.generateId(),
+        item: Item.message(
+          id: RealtimeUtils.generateId(),
+          status: ItemStatus.completed,
+          role: ItemRole.assistant,
+          content: content,
+        ),
+      ),
+    );
+    return true;
   }
 
   /// Appends user audio to the existing audio buffer.

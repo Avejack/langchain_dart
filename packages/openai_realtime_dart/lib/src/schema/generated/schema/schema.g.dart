@@ -79,14 +79,20 @@ Map<String, dynamic> _$$InputAudioTranscriptionConfigImplToJson(
 _$TurnDetectionImpl _$$TurnDetectionImplFromJson(Map<String, dynamic> json) =>
     _$TurnDetectionImpl(
       type: $enumDecode(_$TurnDetectionTypeEnumMap, json['type']),
+      eagerness: $enumDecodeNullable(
+              _$TurnDetectionEagernessEnumMap, json['eagerness']) ??
+          TurnDetectionEagerness.auto,
       threshold: (json['threshold'] as num?)?.toDouble(),
       prefixPaddingMs: (json['prefix_padding_ms'] as num?)?.toInt(),
       silenceDurationMs: (json['silence_duration_ms'] as num?)?.toInt(),
+      createResponse: json['create_response'] as bool? ?? true,
+      interruptResponse: json['interrupt_response'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$$TurnDetectionImplToJson(_$TurnDetectionImpl instance) {
   final val = <String, dynamic>{
     'type': _$TurnDetectionTypeEnumMap[instance.type]!,
+    'eagerness': _$TurnDetectionEagernessEnumMap[instance.eagerness]!,
   };
 
   void writeNotNull(String key, dynamic value) {
@@ -98,11 +104,21 @@ Map<String, dynamic> _$$TurnDetectionImplToJson(_$TurnDetectionImpl instance) {
   writeNotNull('threshold', instance.threshold);
   writeNotNull('prefix_padding_ms', instance.prefixPaddingMs);
   writeNotNull('silence_duration_ms', instance.silenceDurationMs);
+  val['create_response'] = instance.createResponse;
+  val['interrupt_response'] = instance.interruptResponse;
   return val;
 }
 
 const _$TurnDetectionTypeEnumMap = {
   TurnDetectionType.serverVad: 'server_vad',
+  TurnDetectionType.semanticVad: 'semantic_vad',
+};
+
+const _$TurnDetectionEagernessEnumMap = {
+  TurnDetectionEagerness.low: 'low',
+  TurnDetectionEagerness.medium: 'medium',
+  TurnDetectionEagerness.high: 'high',
+  TurnDetectionEagerness.auto: 'auto',
 };
 
 _$RateLimitImpl _$$RateLimitImplFromJson(Map<String, dynamic> json) =>
@@ -354,6 +370,10 @@ _$UsageInputTokenDetailsImpl _$$UsageInputTokenDetailsImplFromJson(
       cachedTokens: (json['cached_tokens'] as num?)?.toInt(),
       textTokens: (json['text_tokens'] as num?)?.toInt(),
       audioTokens: (json['audio_tokens'] as num?)?.toInt(),
+      cachedTokensDetails: json['cached_tokens_details'] == null
+          ? null
+          : UsageInputTokenDetailsCachedTokensDetails.fromJson(
+              json['cached_tokens_details'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$UsageInputTokenDetailsImplToJson(
@@ -369,6 +389,7 @@ Map<String, dynamic> _$$UsageInputTokenDetailsImplToJson(
   writeNotNull('cached_tokens', instance.cachedTokens);
   writeNotNull('text_tokens', instance.textTokens);
   writeNotNull('audio_tokens', instance.audioTokens);
+  writeNotNull('cached_tokens_details', instance.cachedTokensDetails?.toJson());
   return val;
 }
 
@@ -381,6 +402,29 @@ _$UsageOutputTokenDetailsImpl _$$UsageOutputTokenDetailsImplFromJson(
 
 Map<String, dynamic> _$$UsageOutputTokenDetailsImplToJson(
     _$UsageOutputTokenDetailsImpl instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('text_tokens', instance.textTokens);
+  writeNotNull('audio_tokens', instance.audioTokens);
+  return val;
+}
+
+_$UsageInputTokenDetailsCachedTokensDetailsImpl
+    _$$UsageInputTokenDetailsCachedTokensDetailsImplFromJson(
+            Map<String, dynamic> json) =>
+        _$UsageInputTokenDetailsCachedTokensDetailsImpl(
+          textTokens: (json['text_tokens'] as num?)?.toInt(),
+          audioTokens: (json['audio_tokens'] as num?)?.toInt(),
+        );
+
+Map<String, dynamic> _$$UsageInputTokenDetailsCachedTokensDetailsImplToJson(
+    _$UsageInputTokenDetailsCachedTokensDetailsImpl instance) {
   final val = <String, dynamic>{};
 
   void writeNotNull(String key, dynamic value) {
@@ -1247,6 +1291,8 @@ const _$RealtimeEventTypeEnumMap = {
   RealtimeEventType.conversationItemDeleted: 'conversation.item.deleted',
   RealtimeEventType.conversationItemInputAudioTranscriptionCompleted:
       'conversation.item.input_audio_transcription.completed',
+  RealtimeEventType.conversationItemInputAudioTranscriptionDelta:
+      'conversation.item.input_audio_transcription.delta',
   RealtimeEventType.conversationItemInputAudioTranscriptionFailed:
       'conversation.item.input_audio_transcription.failed',
   RealtimeEventType.conversationItemTruncated: 'conversation.item.truncated',
@@ -1478,13 +1524,22 @@ _$RealtimeEventConversationItemCreatedImpl
         );
 
 Map<String, dynamic> _$$RealtimeEventConversationItemCreatedImplToJson(
-        _$RealtimeEventConversationItemCreatedImpl instance) =>
-    <String, dynamic>{
-      'event_id': instance.eventId,
-      'type': _$RealtimeEventTypeEnumMap[instance.type]!,
-      'previous_item_id': instance.previousItemId,
-      'item': instance.item.toJson(),
-    };
+    _$RealtimeEventConversationItemCreatedImpl instance) {
+  final val = <String, dynamic>{
+    'event_id': instance.eventId,
+    'type': _$RealtimeEventTypeEnumMap[instance.type]!,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('previous_item_id', instance.previousItemId);
+  val['item'] = instance.item.toJson();
+  return val;
+}
 
 _$RealtimeEventConversationItemDeletedImpl
     _$$RealtimeEventConversationItemDeletedImplFromJson(
@@ -1528,6 +1583,39 @@ Map<String, dynamic>
           'content_index': instance.contentIndex,
           'transcript': instance.transcript,
         };
+
+_$RealtimeEventConversationItemInputAudioTranscriptionDeltaImpl
+    _$$RealtimeEventConversationItemInputAudioTranscriptionDeltaImplFromJson(
+            Map<String, dynamic> json) =>
+        _$RealtimeEventConversationItemInputAudioTranscriptionDeltaImpl(
+          eventId: json['event_id'] as String,
+          type: $enumDecodeNullable(_$RealtimeEventTypeEnumMap, json['type']) ??
+              RealtimeEventType.conversationItemInputAudioTranscriptionDelta,
+          itemId: json['item_id'] as String,
+          contentIndex: (json['content_index'] as num?)?.toInt(),
+          delta: json['delta'] as String?,
+        );
+
+Map<String, dynamic>
+    _$$RealtimeEventConversationItemInputAudioTranscriptionDeltaImplToJson(
+        _$RealtimeEventConversationItemInputAudioTranscriptionDeltaImpl
+            instance) {
+  final val = <String, dynamic>{
+    'event_id': instance.eventId,
+    'type': _$RealtimeEventTypeEnumMap[instance.type]!,
+    'item_id': instance.itemId,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('content_index', instance.contentIndex);
+  writeNotNull('delta', instance.delta);
+  return val;
+}
 
 _$RealtimeEventConversationItemInputAudioTranscriptionFailedImpl
     _$$RealtimeEventConversationItemInputAudioTranscriptionFailedImplFromJson(
@@ -1616,18 +1704,27 @@ _$RealtimeEventInputAudioBufferCommittedImpl
           eventId: json['event_id'] as String,
           type: $enumDecodeNullable(_$RealtimeEventTypeEnumMap, json['type']) ??
               RealtimeEventType.inputAudioBufferCommitted,
-          previousItemId: json['previous_item_id'] as String,
+          previousItemId: json['previous_item_id'] as String?,
           itemId: json['item_id'] as String,
         );
 
 Map<String, dynamic> _$$RealtimeEventInputAudioBufferCommittedImplToJson(
-        _$RealtimeEventInputAudioBufferCommittedImpl instance) =>
-    <String, dynamic>{
-      'event_id': instance.eventId,
-      'type': _$RealtimeEventTypeEnumMap[instance.type]!,
-      'previous_item_id': instance.previousItemId,
-      'item_id': instance.itemId,
-    };
+    _$RealtimeEventInputAudioBufferCommittedImpl instance) {
+  final val = <String, dynamic>{
+    'event_id': instance.eventId,
+    'type': _$RealtimeEventTypeEnumMap[instance.type]!,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('previous_item_id', instance.previousItemId);
+  val['item_id'] = instance.itemId;
+  return val;
+}
 
 _$RealtimeEventInputAudioBufferSpeechStartedImpl
     _$$RealtimeEventInputAudioBufferSpeechStartedImplFromJson(

@@ -302,32 +302,69 @@ components:
             supported model.
     TurnDetection:
       type: object
-      description: |
-        Configuration for turn detection. Can be set to `null` to turn off. Server 
-        VAD means that the model will detect the start and end of speech based on 
-        audio volume and respond at the end of user speech.
+      description: >
+        Configuration for turn detection, ether Server VAD or Semantic VAD.
+        This can be set to `null` to turn off, in which case the client must
+        manually trigger model response.
+
+        Server VAD means that the model will detect the start and end of
+        speech based on audio volume and respond at the end of user speech.
+
+        Semantic VAD is more advanced and uses a turn detection model (in
+        conjuction with VAD) to semantically estimate whether the user has
+        finished speaking, then dynamically sets a timeout based on this
+        probability. For example, if user audio trails off with "uhhm", the
+        model will score a low probability of turn end and wait longer for
+        the user to continue speaking. This can be useful for more natural
+        conversations, but may have a higher latency.
       properties:
         type:
           $ref: "#/components/schemas/TurnDetectionType"
+          default: server_vad
           description: |
-            Type of turn detection, only `server_vad` is currently supported.
+            Type of turn detection.
+        eagerness:
+          $ref: "#/components/schemas/TurnDetectionEagerness"
+          default: auto
+          description: >
+            Used only for `semantic_vad` mode. The eagerness of the model to
+            respond. `low` will wait longer for the user to continue
+            speaking, `high` will respond more quickly. `auto` is the
+            default and is equivalent to `medium`.
         threshold:
           type: number
-          description: |
-            Activation threshold for VAD (0.0 to 1.0), this defaults to 0.5. A 
-            higher threshold will require louder audio to activate the model, and 
-            thus might perform better in noisy environments.
+          description: >
+            Used only for `server_vad` mode. Activation threshold for VAD
+            (0.0 to 1.0), this defaults to 0.5. A higher threshold will require
+            louder audio to activate the model, and thus might perform better
+            in noisy environments.
         prefix_padding_ms:
           type: integer
-          description: |
-            Amount of audio to include before the VAD detected speech (in 
-            milliseconds). Defaults to 300ms.
+          description: >
+            Used only for `server_vad` mode. Amount of audio to include
+            before the VAD detected speech (in milliseconds). Defaults to 300ms.
         silence_duration_ms:
           type: integer
-          description: |
-            Duration of silence to detect speech stop (in milliseconds). Defaults 
-            to 500ms. With shorter values the model will respond more quickly, 
-            but may jump in on short pauses from the user.
+          description: >
+            Used only for `server_vad` mode. Duration of silence to detect
+            speech stop (in milliseconds). Defaults to 500ms. With shorter
+            values the model will respond more quickly, but may jump in on
+            short pauses from the user.
+        create_response:
+          type: boolean
+          default: true
+          description: >
+            Whether or not to automatically generate a response when a VAD
+            stop event occurs.
+        interrupt_response:
+          type: boolean
+          default: true
+          description: >
+            Whether or not to automatically interrupt any ongoing response
+            with output to the default
+
+            conversation (i.e. `conversation` of `auto`) when a VAD start
+            event occurs.
       required:
         - type
     TurnDetectionType:
@@ -335,6 +372,15 @@ components:
       description: The type of turn detection.
       enum:
         - server_vad
+        - semantic_vad
+    TurnDetectionEagerness:
+      type: string
+      description: The eagerness of `semantic_vad` turn detection.
+      enum:
+        - low
+        - medium
+        - high
+        - auto
     RateLimit:
       type: object
       description: Rate limit information.
@@ -473,7 +519,8 @@ components:
           description: Instructions for the model.
         voice:
           $ref: "#/components/schemas/Voice"
-          description: The voice the model uses to respond - one of `alloy`, `echo`, or
+          description:
+            The voice the model uses to respond - one of `alloy`, `echo`, or
             `shimmer`.
         output_audio_format:
           $ref: "#/components/schemas/AudioFormat"
@@ -492,13 +539,14 @@ components:
                 `none` means the model will not call any tool and instead generates a message.
                 `auto` means the model can pick between generating a message or calling one or more tools.
                 `required` means the model must call one or more tools.
-              enum: [ none, auto, required ]
+              enum: [none, auto, required]
             - $ref: "#/components/schemas/ToolChoiceForced"
         temperature:
           type: number
           description: Sampling temperature.
         max_response_output_tokens:
-          description: Maximum number of output tokens for a single assistant response,
+          description:
+            Maximum number of output tokens for a single assistant response,
             inclusive of tool calls. Defaults to "inf".
           oneOf:
             - type: integer
@@ -535,6 +583,16 @@ components:
             audio_tokens:
               type: integer
               description: The number of audio tokens used in the Response.
+            cached_tokens_details:
+              type: object
+              description: Details about the cached tokens used in the Response.
+              properties:
+                text_tokens:
+                  type: integer
+                  description: The number of cached text tokens used in the Response.
+                audio_tokens:
+                  type: integer
+                  description: The number of cached audio tokens used in the Response.
         output_token_details:
           type: object
           description: Details about the output tokens used in the Response.
@@ -572,7 +630,8 @@ components:
           description: The default system instructions.
         voice:
           $ref: "#/components/schemas/Voice"
-          description: The voice the model uses to respond - one of `alloy`, `echo`, or
+          description:
+            The voice the model uses to respond - one of `alloy`, `echo`, or
             `shimmer`.
         input_audio_format:
           $ref: "#/components/schemas/AudioFormat"
@@ -598,14 +657,17 @@ components:
                 `none` means the model will not call any tool and instead generates a message.
                 `auto` means the model can pick between generating a message or calling one or more tools.
                 `required` means the model must call one or more tools.
-              enum: [ none, auto, required ]
+              enum: [none, auto, required]
             - $ref: "#/components/schemas/ToolChoiceForced"
         temperature:
           type: number
           description: Sampling temperature.
         max_response_output_tokens:
-          description: Maximum number of output tokens for a single assistant response,
-            inclusive of tool calls. Defaults to "inf".
+          description: |
+            Maximum number of output tokens for a single assistant response,
+            inclusive of tool calls. Provide an integer between 1 and 4096 to
+            limit output tokens, or `inf` for the maximum available tokens for a
+            given model. Defaults to `inf`.
           oneOf:
             - type: integer
               description: Provide an integer between 1 and 4096 to limit output tokens.
@@ -679,7 +741,7 @@ components:
                 `none` means the model will not call any tool and instead generates a message.
                 `auto` means the model can pick between generating a message or calling one or more tools.
                 `required` means the model must call one or more tools.
-              enum: [ none, auto, required ]
+              enum: [none, auto, required]
             - $ref: "#/components/schemas/ToolChoiceForced"
         temperature:
           type: number
@@ -772,7 +834,7 @@ components:
           type: string
           description: The transcript.
         tool:
-          $ref: '#/components/schemas/FormattedTool'
+          $ref: "#/components/schemas/FormattedTool"
           nullable: true
         output:
           type: string
@@ -787,9 +849,9 @@ components:
       description: A formatted item.
       properties:
         item:
-          $ref: '#/components/schemas/Item'
+          $ref: "#/components/schemas/Item"
         formatted:
-          $ref: '#/components/schemas/FormattedProperty'
+          $ref: "#/components/schemas/FormattedProperty"
           nullable: true
       required:
         - item
@@ -828,13 +890,13 @@ components:
       description:
       properties:
         item:
-          $ref: '#/components/schemas/FormattedItem'
+          $ref: "#/components/schemas/FormattedItem"
           nullable: true
         delta:
-          $ref: '#/components/schemas/Delta'
+          $ref: "#/components/schemas/Delta"
           nullable: true
         response:
-          $ref: '#/components/schemas/Response'
+          $ref: "#/components/schemas/Response"
           nullable: true
     TranscriptionError:
       type: object
@@ -870,7 +932,8 @@ components:
           description: Parameter related to the error, if any.
         event_id:
           type: string
-          description: The event_id of the client event that caused the error, if
+          description:
+            The event_id of the client event that caused the error, if
             applicable.
     RealtimeEvent:
       type: object
@@ -889,6 +952,7 @@ components:
         - $ref: "#/components/schemas/RealtimeEventConversationItemCreated"
         - $ref: "#/components/schemas/RealtimeEventConversationItemDeleted"
         - $ref: "#/components/schemas/RealtimeEventConversationItemInputAudioTranscriptionCompleted"
+        - $ref: "#/components/schemas/RealtimeEventConversationItemInputAudioTranscriptionDelta"
         - $ref: "#/components/schemas/RealtimeEventConversationItemInputAudioTranscriptionFailed"
         - $ref: "#/components/schemas/RealtimeEventConversationItemTruncated"
         - $ref: "#/components/schemas/RealtimeEventError"
@@ -938,6 +1002,7 @@ components:
         - conversation.item.created
         - conversation.item.deleted
         - conversation.item.input_audio_transcription.completed
+        - conversation.item.input_audio_transcription.delta
         - conversation.item.input_audio_transcription.failed
         - conversation.item.truncated
         - error
@@ -1225,7 +1290,6 @@ components:
           $ref: "#/components/schemas/Item"
       required:
         - event_id
-        - previous_item_id
         - item
     RealtimeEventConversationItemDeleted:
       type: object
@@ -1280,6 +1344,31 @@ components:
         - item_id
         - content_index
         - transcript
+    RealtimeEventConversationItemInputAudioTranscriptionDelta:
+      type: object
+      description: >
+        Returned when the text value of an input audio transcription content
+        part is updated.
+      properties:
+        event_id:
+          type: string
+          description: The unique ID of the server event.
+        type:
+          $ref: "#/components/schemas/RealtimeEventType"
+          description: The event type, must be `conversation.item.input_audio_transcription.delta`.
+          default: conversation.item.input_audio_transcription.delta
+        item_id:
+          type: string
+          description: The ID of the item.
+        content_index:
+          type: integer
+          description: The index of the content part in the item's content array.
+        delta:
+          type: string
+          description: The text delta.
+      required:
+        - event_id
+        - item_id
     RealtimeEventConversationItemInputAudioTranscriptionFailed:
       type: object
       description: |
@@ -1387,14 +1476,14 @@ components:
           default: input_audio_buffer.committed
         previous_item_id:
           type: string
-          description: The ID of the preceding item after which the new item will be
+          description:
+            The ID of the preceding item after which the new item will be
             inserted.
         item_id:
           type: string
           description: The ID of the user message item that will be created.
       required:
         - event_id
-        - previous_item_id
         - item_id
     RealtimeEventInputAudioBufferSpeechStarted:
       type: object
@@ -1422,7 +1511,8 @@ components:
             includes the `prefix_padding_ms` configured in the Session.
         item_id:
           type: string
-          description: The ID of the user message item that will be created when speech
+          description:
+            The ID of the user message item that will be created when speech
             stops.
       required:
         - event_id
@@ -1512,7 +1602,8 @@ components:
         - delta
     RealtimeEventResponseAudioDone:
       type: object
-      description: Returned when the model-generated audio is done. Also emitted when
+      description:
+        Returned when the model-generated audio is done. Also emitted when
         a Response is interrupted, incomplete, or cancelled.
       properties:
         event_id:
@@ -1542,7 +1633,8 @@ components:
         - content_index
     RealtimeEventResponseAudioTranscriptDelta:
       type: object
-      description: Returned when the model-generated transcription of audio output is
+      description:
+        Returned when the model-generated transcription of audio output is
         updated.
       properties:
         event_id:
@@ -1576,7 +1668,8 @@ components:
         - delta
     RealtimeEventResponseAudioTranscriptDone:
       type: object
-      description: Returned when the model-generated transcription of audio output is
+      description:
+        Returned when the model-generated transcription of audio output is
         done streaming. Also emitted when a Response is interrupted, incomplete,
         or cancelled.
       properties:
@@ -1611,7 +1704,8 @@ components:
         - transcript
     RealtimeEventResponseContentPartAdded:
       type: object
-      description: Returned when a new content part is added to an assistant message
+      description:
+        Returned when a new content part is added to an assistant message
         item during response generation.
       properties:
         event_id:
@@ -1644,7 +1738,8 @@ components:
         - part
     RealtimeEventResponseContentPartDone:
       type: object
-      description: Returned when a content part is done streaming in an assistant
+      description:
+        Returned when a content part is done streaming in an assistant
         message item. Also emitted when a Response is interrupted, incomplete,
         or cancelled.
       properties:
@@ -1748,7 +1843,8 @@ components:
         - delta
     RealtimeEventResponseFunctionCallArgumentsDone:
       type: object
-      description: Returned when the model-generated function call arguments are done
+      description:
+        Returned when the model-generated function call arguments are done
         streaming. Also emitted when a Response is interrupted, incomplete, or
         cancelled.
       properties:
@@ -1974,7 +2070,7 @@ components:
           description: The type of the event.
           default: conversation.updated
         result:
-          $ref: '#/components/schemas/EventHandlerResult'
+          $ref: "#/components/schemas/EventHandlerResult"
       required:
         - event_id
         - result
@@ -1990,7 +2086,7 @@ components:
           description: The type of the event.
           default: conversation.item.appended
         item:
-          $ref: '#/components/schemas/FormattedItem'
+          $ref: "#/components/schemas/FormattedItem"
       required:
         - event_id
         - item
@@ -2006,7 +2102,7 @@ components:
           description: The type of the event.
           default: conversation.item.completed
         item:
-          $ref: '#/components/schemas/FormattedItem'
+          $ref: "#/components/schemas/FormattedItem"
       required:
         - event_id
         - item
@@ -2022,7 +2118,7 @@ components:
           description: The type of the event.
           default: realtime.event
         event:
-          $ref: '#/components/schemas/RealtimeEvent'
+          $ref: "#/components/schemas/RealtimeEvent"
       required:
         - event_id
         - event

@@ -36,6 +36,8 @@ enum RealtimeEventType {
   conversationItemDeleted,
   @JsonValue('conversation.item.input_audio_transcription.completed')
   conversationItemInputAudioTranscriptionCompleted,
+  @JsonValue('conversation.item.input_audio_transcription.delta')
+  conversationItemInputAudioTranscriptionDelta,
   @JsonValue('conversation.item.input_audio_transcription.failed')
   conversationItemInputAudioTranscriptionFailed,
   @JsonValue('conversation.item.truncated')
