@@ -290,11 +290,13 @@ components:
         - output
     InputAudioTranscriptionConfig:
       type: object
-      description: Configuration for input audio transcription.
+      description: |
+        Configuration for input audio transcription, defaults to off and can be 
+        set to `null` to turn off once on. Input audio transcription is not native 
+        to the model, since the model consumes audio directly. Transcription runs 
+        asynchronously through Whisper and should be treated as rough guidance 
+        rather than the representation understood by the model.
       properties:
-        enabled:
-          type: boolean
-          description: Whether input audio transcription is enabled.
         model:
           type: string
           description: |
@@ -725,6 +727,7 @@ components:
         turn_detection:
           $ref: "#/components/schemas/TurnDetection"
           nullable: true
+          default: null
         tools:
           type: array
           description: Tools (functions) available to the model.
@@ -759,6 +762,8 @@ components:
             - type: string
               description: Use inf for the maximum available tokens for a given model.
               default: inf
+      required:
+        - turn_detection
     Conversation:
       type: object
       description: The conversation resource.

@@ -86,6 +86,7 @@
         - [Split by character](/modules/retrieval/document_transformers/text_splitters/character_text_splitter.md)
         - [Recursively split by character](/modules/retrieval/document_transformers/text_splitters/recursive_character_text_splitter.md)
         - [Split code](/modules/retrieval/document_transformers/text_splitters/code_text_splitter.md)
+        - [Split markdown](/modules/retrieval/document_transformers/text_splitters/markdown_text_splitter.md)
     - [Text embedding models](/modules/retrieval/text_embedding/text_embedding.md)
       - Integrations
         - [OpenAI](/modules/retrieval/text_embedding/integrations/openai.md)
@@ -128,4 +129,6 @@
     - [Tools](/modules/agents/tools/tools.md)
       - [Calculator](/modules/agents/tools/calculator.md)
       - [DALL-E Image Generator](/modules/agents/tools/openai_dall_e.md)
+      - [Tavily Answer](/modules/agents/tools/tavily_answer.md)
+      - [Tavily Search Results](/modules/agents/tools/tavily_search_results.md)
     - [Toolkits](/modules/agents/toolkits/toolkits.md)

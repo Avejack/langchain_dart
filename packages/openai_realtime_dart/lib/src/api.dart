@@ -47,13 +47,16 @@ class RealtimeAPI extends RealtimeEventHandler {
   final bool dangerouslyAllowAPIKeyInBrowser;
 
   WebSocketChannel? _ws;
-  String _model = '';
+  var _model = '';
   StreamSubscription<dynamic>? _logSubscription;
 
   /// Tells us whether or not the WebSocket is connected.
   bool isConnected() => _ws != null;
 
   /// Connects to Realtime API Websocket Server.
+  ///
+  /// [model] specifies which model to use. You can find the list of available
+  /// models [here](https://platform.openai.com/docs/models).
   Future<bool> connect({
     final String model = 'gpt-4o-realtime-preview-2024-12-17',
   }) async {

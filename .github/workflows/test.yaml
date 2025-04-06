@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Flutter
-        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff
+        uses: subosito/flutter-action@e938fdf56512cc96ef2f93601a5a40bde3801046
         with:
           channel: 'stable'
 
@@ -46,7 +46,7 @@ jobs:
           run-bootstrap: false
 
       - name: Bootstrap
-        uses: nick-invision/retry@7152eba30c6575329ac0576536151aca5a72780e
+        uses: nick-invision/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08
         with:
           timeout_minutes: 5
           max_attempts: 5

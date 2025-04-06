@@ -456,10 +456,6 @@ InputAudioTranscriptionConfig _$InputAudioTranscriptionConfigFromJson(
 
 /// @nodoc
 mixin _$InputAudioTranscriptionConfig {
-  /// Whether input audio transcription is enabled.
-  @JsonKey(includeIfNull: false)
-  bool? get enabled => throw _privateConstructorUsedError;
-
   /// The model to use for transcription, `whisper-1` is the only currently
   /// supported model.
   @JsonKey(includeIfNull: false)
@@ -483,9 +479,7 @@ abstract class $InputAudioTranscriptionConfigCopyWith<$Res> {
       _$InputAudioTranscriptionConfigCopyWithImpl<$Res,
           InputAudioTranscriptionConfig>;
   @useResult
-  $Res call(
-      {@JsonKey(includeIfNull: false) bool? enabled,
-      @JsonKey(includeIfNull: false) String? model});
+  $Res call({@JsonKey(includeIfNull: false) String? model});
 }
 
 /// @nodoc
@@ -504,14 +498,9 @@ class _$InputAudioTranscriptionConfigCopyWithImpl<$Res,
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? enabled = freezed,
     Object? model = freezed,
   }) {
     return _then(_value.copyWith(
-      enabled: freezed == enabled
-          ? _value.enabled
-          : enabled // ignore: cast_nullable_to_non_nullable
-              as bool?,
       model: freezed == model
           ? _value.model
           : model // ignore: cast_nullable_to_non_nullable
@@ -529,9 +518,7 @@ abstract class _$$InputAudioTranscriptionConfigImplCopyWith<$Res>
       __$$InputAudioTranscriptionConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {@JsonKey(includeIfNull: false) bool? enabled,
-      @JsonKey(includeIfNull: false) String? model});
+  $Res call({@JsonKey(includeIfNull: false) String? model});
 }
 
 /// @nodoc
@@ -549,14 +536,9 @@ class __$$InputAudioTranscriptionConfigImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? enabled = freezed,
     Object? model = freezed,
   }) {
     return _then(_$InputAudioTranscriptionConfigImpl(
-      enabled: freezed == enabled
-          ? _value.enabled
-          : enabled // ignore: cast_nullable_to_non_nullable
-              as bool?,
       model: freezed == model
           ? _value.model
           : model // ignore: cast_nullable_to_non_nullable
@@ -570,18 +552,12 @@ class __$$InputAudioTranscriptionConfigImplCopyWithImpl<$Res>
 class _$InputAudioTranscriptionConfigImpl
     extends _InputAudioTranscriptionConfig {
   const _$InputAudioTranscriptionConfigImpl(
-      {@JsonKey(includeIfNull: false) this.enabled,
-      @JsonKey(includeIfNull: false) this.model})
+      {@JsonKey(includeIfNull: false) this.model})
       : super._();
 
   factory _$InputAudioTranscriptionConfigImpl.fromJson(
           Map<String, dynamic> json) =>
       _$$InputAudioTranscriptionConfigImplFromJson(json);
-
-  /// Whether input audio transcription is enabled.
-  @override
-  @JsonKey(includeIfNull: false)
-  final bool? enabled;
 
   /// The model to use for transcription, `whisper-1` is the only currently
   /// supported model.
@@ -591,7 +567,7 @@ class _$InputAudioTranscriptionConfigImpl
 
   @override
   String toString() {
-    return 'InputAudioTranscriptionConfig(enabled: $enabled, model: $model)';
+    return 'InputAudioTranscriptionConfig(model: $model)';
   }
 
   @override
@@ -599,13 +575,12 @@ class _$InputAudioTranscriptionConfigImpl
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$InputAudioTranscriptionConfigImpl &&
-            (identical(other.enabled, enabled) || other.enabled == enabled) &&
             (identical(other.model, model) || other.model == model));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, enabled, model);
+  int get hashCode => Object.hash(runtimeType, model);
 
   /// Create a copy of InputAudioTranscriptionConfig
   /// with the given fields replaced by the non-null parameter values.
@@ -628,18 +603,12 @@ class _$InputAudioTranscriptionConfigImpl
 abstract class _InputAudioTranscriptionConfig
     extends InputAudioTranscriptionConfig {
   const factory _InputAudioTranscriptionConfig(
-          {@JsonKey(includeIfNull: false) final bool? enabled,
-          @JsonKey(includeIfNull: false) final String? model}) =
+          {@JsonKey(includeIfNull: false) final String? model}) =
       _$InputAudioTranscriptionConfigImpl;
   const _InputAudioTranscriptionConfig._() : super._();
 
   factory _InputAudioTranscriptionConfig.fromJson(Map<String, dynamic> json) =
       _$InputAudioTranscriptionConfigImpl.fromJson;
-
-  /// Whether input audio transcription is enabled.
-  @override
-  @JsonKey(includeIfNull: false)
-  bool? get enabled;
 
   /// The model to use for transcription, `whisper-1` is the only currently
   /// supported model.
@@ -4091,7 +4060,11 @@ mixin _$Session {
       unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
   AudioFormat? get outputAudioFormat => throw _privateConstructorUsedError;
 
-  /// Configuration for input audio transcription.
+  /// Configuration for input audio transcription, defaults to off and can be
+  /// set to `null` to turn off once on. Input audio transcription is not native
+  /// to the model, since the model consumes audio directly. Transcription runs
+  /// asynchronously through Whisper and should be treated as rough guidance
+  /// rather than the representation understood by the model.
   @JsonKey(name: 'input_audio_transcription', includeIfNull: false)
   InputAudioTranscriptionConfig? get inputAudioTranscription =>
       throw _privateConstructorUsedError;
@@ -4580,7 +4553,11 @@ class _$SessionImpl extends _Session {
       unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
   final AudioFormat? outputAudioFormat;
 
-  /// Configuration for input audio transcription.
+  /// Configuration for input audio transcription, defaults to off and can be
+  /// set to `null` to turn off once on. Input audio transcription is not native
+  /// to the model, since the model consumes audio directly. Transcription runs
+  /// asynchronously through Whisper and should be treated as rough guidance
+  /// rather than the representation understood by the model.
   @override
   @JsonKey(name: 'input_audio_transcription', includeIfNull: false)
   final InputAudioTranscriptionConfig? inputAudioTranscription;
@@ -4791,7 +4768,11 @@ abstract class _Session extends Session {
       unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
   AudioFormat? get outputAudioFormat;
 
-  /// Configuration for input audio transcription.
+  /// Configuration for input audio transcription, defaults to off and can be
+  /// set to `null` to turn off once on. Input audio transcription is not native
+  /// to the model, since the model consumes audio directly. Transcription runs
+  /// asynchronously through Whisper and should be treated as rough guidance
+  /// rather than the representation understood by the model.
   @override
   @JsonKey(name: 'input_audio_transcription', includeIfNull: false)
   InputAudioTranscriptionConfig? get inputAudioTranscription;
@@ -5830,8 +5811,7 @@ abstract class $SessionConfigCopyWith<$Res> {
       AudioFormat? outputAudioFormat,
       @JsonKey(name: 'input_audio_transcription', includeIfNull: false)
       InputAudioTranscriptionConfig? inputAudioTranscription,
-      @JsonKey(name: 'turn_detection', includeIfNull: false)
-      TurnDetection? turnDetection,
+      @JsonKey(name: 'turn_detection') TurnDetection? turnDetection,
       @JsonKey(includeIfNull: false) List<ToolDefinition>? tools,
       @_SessionConfigToolChoiceConverter()
       @JsonKey(name: 'tool_choice', includeIfNull: false)
@@ -6010,8 +5990,7 @@ abstract class _$$SessionConfigImplCopyWith<$Res>
       AudioFormat? outputAudioFormat,
       @JsonKey(name: 'input_audio_transcription', includeIfNull: false)
       InputAudioTranscriptionConfig? inputAudioTranscription,
-      @JsonKey(name: 'turn_detection', includeIfNull: false)
-      TurnDetection? turnDetection,
+      @JsonKey(name: 'turn_detection') TurnDetection? turnDetection,
       @JsonKey(includeIfNull: false) List<ToolDefinition>? tools,
       @_SessionConfigToolChoiceConverter()
       @JsonKey(name: 'tool_choice', includeIfNull: false)
@@ -6128,7 +6107,7 @@ class _$SessionConfigImpl extends _SessionConfig {
       this.outputAudioFormat,
       @JsonKey(name: 'input_audio_transcription', includeIfNull: false)
       this.inputAudioTranscription,
-      @JsonKey(name: 'turn_detection', includeIfNull: false) this.turnDetection,
+      @JsonKey(name: 'turn_detection') required this.turnDetection,
       @JsonKey(includeIfNull: false) final List<ToolDefinition>? tools,
       @_SessionConfigToolChoiceConverter()
       @JsonKey(name: 'tool_choice', includeIfNull: false)
@@ -6211,7 +6190,7 @@ class _$SessionConfigImpl extends _SessionConfig {
   /// Server VAD means that the model will detect the start and end of speech based on audio volume and respond at the end of user speech.
   /// Semantic VAD is more advanced and uses a turn detection model (in conjuction with VAD) to semantically estimate whether the user has finished speaking, then dynamically sets a timeout based on this probability. For example, if user audio trails off with "uhhm", the model will score a low probability of turn end and wait longer for the user to continue speaking. This can be useful for more natural conversations, but may have a higher latency.
   @override
-  @JsonKey(name: 'turn_detection', includeIfNull: false)
+  @JsonKey(name: 'turn_detection')
   final TurnDetection? turnDetection;
 
   /// Tools (functions) available to the model.
@@ -6335,8 +6314,8 @@ abstract class _SessionConfig extends SessionConfig {
       final AudioFormat? outputAudioFormat,
       @JsonKey(name: 'input_audio_transcription', includeIfNull: false)
       final InputAudioTranscriptionConfig? inputAudioTranscription,
-      @JsonKey(name: 'turn_detection', includeIfNull: false)
-      final TurnDetection? turnDetection,
+      @JsonKey(name: 'turn_detection')
+      required final TurnDetection? turnDetection,
       @JsonKey(includeIfNull: false) final List<ToolDefinition>? tools,
       @_SessionConfigToolChoiceConverter()
       @JsonKey(name: 'tool_choice', includeIfNull: false)
@@ -6409,7 +6388,7 @@ abstract class _SessionConfig extends SessionConfig {
   /// Server VAD means that the model will detect the start and end of speech based on audio volume and respond at the end of user speech.
   /// Semantic VAD is more advanced and uses a turn detection model (in conjuction with VAD) to semantically estimate whether the user has finished speaking, then dynamically sets a timeout based on this probability. For example, if user audio trails off with "uhhm", the model will score a low probability of turn end and wait longer for the user to continue speaking. This can be useful for more natural conversations, but may have a higher latency.
   @override
-  @JsonKey(name: 'turn_detection', includeIfNull: false)
+  @JsonKey(name: 'turn_detection')
   TurnDetection? get turnDetection;
 
   /// Tools (functions) available to the model.
